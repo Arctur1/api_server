@@ -14,7 +14,7 @@ type Database struct {
 var DB *gorm.DB
 
 func Init() *gorm.DB {
-	db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=* dbname=coins password=* sslmode=disable")
+	db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=rozhn dbname=coins password=rozhn sslmode=disable")
 	if err != nil {
 		panic("Can't connect to database")
 	}
@@ -25,7 +25,7 @@ func Init() *gorm.DB {
 }
 
 func TestDBInit() *gorm.DB {
-	test_db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=* dbname=coins_test password=* sslmode=disable")
+	test_db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=rozhn dbname=coins_test password=rozhn sslmode=disable")
 	if err != nil {
 		panic("Can't connect to database")
 	}
