@@ -4,17 +4,9 @@ import (
 	"github.com/arctur1/api_server/controllers"
 	"github.com/arctur1/api_server/models"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
-func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&models.Coin{})
-}
-
 func main() {
-	db := models.Init()
-	Migrate(db)
-	defer db.Close()
 	setupServer().Run(":8080")
 }
 

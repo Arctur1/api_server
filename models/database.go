@@ -1,10 +1,13 @@
 package models
 
 import (
+	"fmt"
+	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/joho/godotenv"
 )
 
 type Database struct {
@@ -14,32 +17,25 @@ type Database struct {
 var DB *gorm.DB
 
 func Init() *gorm.DB {
-	db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=rozhn dbname=coins password=rozhn sslmode=disable")
+
+	if err := godotenv.Load(); err != nil {
+		log.Print("sad .env file found")
+	}
+
+	host, port, dbName, user, pass := os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASS")
+
+	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", host, port, dbName, user, pass)
+
+	db, err := gorm.Open("postgres", DBURL)
 	if err != nil {
 		panic("Can't connect to database")
 	}
 
 	db.DB().SetMaxIdleConns(10)
 	DB = db
+	db.Debug().AutoMigrate(&Coin{})
 	return DB
-}
-
-func TestDBInit() *gorm.DB {
-	test_db, err := gorm.Open("postgres", "host=127.0.0.1 port=5432 user=rozhn dbname=coins_test password=rozhn sslmode=disable")
-	if err != nil {
-		panic("Can't connect to database")
-	}
-
-	test_db.DB().SetMaxIdleConns(3)
-	test_db.LogMode(true)
-	DB = test_db
-	return DB
-}
-
-func TestDBFree(test_db *gorm.DB) error {
-	test_db.Close()
-	err := os.Remove("./../gorm_test.db")
-	return err
 }
 
 func GetDB() *gorm.DB {
