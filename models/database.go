@@ -23,13 +23,14 @@ func Init() *gorm.DB {
 	}
 
 	host, port, dbName, user, pass := os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASS")
+		os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD")
 
-	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", host, port, dbName, user, pass)
+	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+		host, port, user, dbName, pass)
 
 	db, err := gorm.Open("postgres", DBURL)
 	if err != nil {
-		panic("Can't connect to database")
+		fmt.Printf("Cannot connect to %s database", DBURL)
 	}
 
 	db.DB().SetMaxIdleConns(10)
