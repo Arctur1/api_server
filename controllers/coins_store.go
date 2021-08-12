@@ -1,10 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/arctur1/api_server/models"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 type CreateCoinInput struct {
@@ -17,11 +19,17 @@ type UpdateCoinInput struct {
 	Balance int    `json:"balance"`
 }
 
-func GetAllCoins(context *gin.Context) {
-	var coins []models.Coin
+type APIEnv struct {
+	DB *gorm.DB
+}
 
-	models.DB.Find(&coins)
-
+func (a *APIEnv) GetAllCoins(context *gin.Context) {
+	coins, err := GetCoins(a.DB)
+	if err != nil {
+		fmt.Println(err)
+		context.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 	context.JSON(http.StatusOK, gin.H{"coins": coins})
 }
 
