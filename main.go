@@ -20,10 +20,10 @@ func setupServer() *gin.Engine {
 	}
 
 	route.GET("/coins", api.GetAllCoins)
-	route.POST("/coins", controllers.CreateCoin)
-	route.GET("/coins/:id", controllers.GetCoin)
-	route.PATCH("/coins/:id", controllers.UpdateCoin)
-	route.DELETE("/coins/:id", controllers.DeleteCoin)
+	route.POST("/coins", api.CreateCoin)
+	route.GET("/coins/:id", api.GetCoin)
+	route.PATCH("/coins/:id", api.UpdateCoin)
+	route.DELETE("/coins/:id", api.DeleteCoin)
 
 	return route
 }

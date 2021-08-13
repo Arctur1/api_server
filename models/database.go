@@ -25,7 +25,7 @@ func Init() *gorm.DB {
 	host, port, dbName, user, pass := os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD")
 
-	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
+	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		host, port, user, dbName, pass)
 
 	db, err := gorm.Open("postgres", DBURL)
@@ -41,4 +41,9 @@ func Init() *gorm.DB {
 
 func GetDB() *gorm.DB {
 	return DB
+}
+
+func ClearTable() {
+	DB.Exec("DELETE FROM coins")
+	DB.Exec("ALTER SEQUENCE coins_id_seq RESTART WITH 1")
 }

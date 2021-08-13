@@ -24,11 +24,12 @@ func TestDatabaseConnection(t *testing.T) {
 }
 
 func refreshCoinTable() error {
-	err := DB.DropTableIfExists(&Coin{}).Error
+	connection := GetDB()
+	err := connection.DropTableIfExists(&Coin{}).Error
 	if err != nil {
 		return err
 	}
-	err = DB.AutoMigrate(&Coin{}).Error
+	err = connection.AutoMigrate(&Coin{}).Error
 	if err != nil {
 		return err
 	}
@@ -57,14 +58,14 @@ func TestFindAllCoins(t *testing.T) {
 		t.Error("Error loading .env file")
 	}
 
-	Init()
+	db := Init()
 	var coins []Coin
 
 	err := seedOneCoin()
 	if err != nil {
 		log.Fatal(err)
 	}
-	DB.Find(&coins)
+	db.Find(&coins)
 	assert.Equal(t, len(coins), 1)
 
 	err = refreshCoinTable()

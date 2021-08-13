@@ -7,8 +7,8 @@ import (
 
 func GetCoins(db *gorm.DB) ([]models.Coin, error) {
 	coins := []models.Coin{}
-	query := db.Select("coin.*").
-		Group("coin.id")
+	query := db.Select("coins.*").
+		Group("coins.id")
 	if err := query.Find(&coins).Error; err != nil {
 		return coins, err
 	}
@@ -16,7 +16,7 @@ func GetCoins(db *gorm.DB) ([]models.Coin, error) {
 	return coins, nil
 }
 
-func GetBookByID(id string, db *gorm.DB) (models.Coin, bool, error) {
+func GetCoinByID(id string, db *gorm.DB) (models.Coin, bool, error) {
 	coin := models.Coin{}
 
 	query := db.Select("coin.*")
@@ -32,16 +32,16 @@ func GetBookByID(id string, db *gorm.DB) (models.Coin, bool, error) {
 	return coin, true, nil
 }
 
-func DeleteBook(id string, db *gorm.DB) error {
-	var b models.Coin
-	if err := db.Where("id = ? ", id).Delete(&b).Error; err != nil {
+func DeleteCoin(id string, db *gorm.DB) error {
+	var c models.Coin
+	if err := db.Where("id = ? ", id).Delete(&c).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateBook(db *gorm.DB, b *models.Coin) error {
-	if err := db.Save(&b).Error; err != nil {
+func UpdateCoin(db *gorm.DB, c *models.Coin) error {
+	if err := db.Save(&c).Error; err != nil {
 		return err
 	}
 	return nil

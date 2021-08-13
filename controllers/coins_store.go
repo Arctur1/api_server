@@ -23,6 +23,23 @@ type APIEnv struct {
 	DB *gorm.DB
 }
 
+func (a *APIEnv) CreateCoin(c *gin.Context) {
+	coin := models.Coin{}
+	err := c.BindJSON(&coin)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := a.DB.Create(&coin).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, coin)
+}
+
 func (a *APIEnv) GetAllCoins(context *gin.Context) {
 	coins, err := GetCoins(a.DB)
 	if err != nil {
@@ -33,57 +50,74 @@ func (a *APIEnv) GetAllCoins(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"coins": coins})
 }
 
-func GetCoin(context *gin.Context) {
-	var coin models.Coin
-	if err := models.DB.Where("id = ?", context.Param("id")).First(&coin).Error; err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Not found"})
+func (a *APIEnv) GetCoin(context *gin.Context) {
+	id := context.Params.ByName("id")
+	coin, exists, err := GetCoinByID(id, a.DB)
+	if err != nil {
+		fmt.Println(err)
+		context.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"coins": coin})
+	if !exists {
+		context.JSON(http.StatusNotFound, "there is no coin in db")
+		return
+	}
+
+	context.JSON(http.StatusOK, coin)
 }
 
-func CreateCoin(context *gin.Context) {
-	var input CreateCoinInput
-	if err := context.ShouldBindJSON(&input); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func (a *APIEnv) DeleteCoin(c *gin.Context) {
+	id := c.Params.ByName("id")
+	_, exists, err := GetCoinByID(id, a.DB)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	coin := models.Coin{Coin: input.Coin, Balance: input.Balance}
-	models.DB.Create(&coin)
+	if !exists {
+		c.JSON(http.StatusNotFound, "record not exists")
+		return
+	}
 
-	context.JSON(http.StatusOK, gin.H{"coins": coin})
+	err = DeleteCoin(id, a.DB)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, "record deleted successfully")
 }
 
-func UpdateCoin(context *gin.Context) {
-
-	var coin models.Coin
-	if err := models.DB.Where("id = ?", context.Param("id")).First(&coin).Error; err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Not found"})
+func (a *APIEnv) UpdateCoin(c *gin.Context) {
+	id := c.Params.ByName("id")
+	_, exists, err := GetCoinByID(id, a.DB)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	var input UpdateCoinInput
-	if err := context.ShouldBindJSON(&input); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if !exists {
+		c.JSON(http.StatusNotFound, "record not exists")
 		return
 	}
 
-	models.DB.Model(&coin).Update(input)
-
-	context.JSON(http.StatusOK, gin.H{"coins": coin})
-}
-
-func DeleteCoin(context *gin.Context) {
-
-	var coin models.Coin
-	if err := models.DB.Where("id = ?", context.Param("id")).First(&coin).Error; err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "Not found"})
+	updatedCoin := models.Coin{}
+	err = c.BindJSON(&updatedCoin)
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	models.DB.Delete(&coin)
+	if err := UpdateCoin(a.DB, &updatedCoin); err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	context.JSON(http.StatusOK, gin.H{"coins": true})
+	a.GetCoin(c)
 }
