@@ -35,7 +35,7 @@ func Init() *gorm.DB {
 
 	db.DB().SetMaxIdleConns(10)
 	DB = db
-	db.Debug().AutoMigrate(&Coin{})
+	db.Debug().AutoMigrate(&Coin{}, &User{})
 	return DB
 }
 
@@ -45,5 +45,8 @@ func GetDB() *gorm.DB {
 
 func ClearTable() {
 	DB.Exec("DELETE FROM coins")
+	DB.Exec("DELETE FROM users")
 	DB.Exec("ALTER SEQUENCE coins_id_seq RESTART WITH 1")
+	DB.Exec("ALTER SEQUENCE users_id_seq RESTART WITH 1")
+
 }
