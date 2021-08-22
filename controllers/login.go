@@ -33,3 +33,26 @@ func (a *APIEnv) Signup(c *gin.Context) {
 	c.JSON(http.StatusOK, "Signed up")
 
 }
+
+func (a *APIEnv) Signin(context *gin.Context) {
+	password := context.Params.ByName("password")
+	username := context.Params.ByName("username")
+	user, exists, err := GetUserByName(username, a.DB)
+	if err != nil {
+		fmt.Println(err)
+		context.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if !exists {
+		context.JSON(http.StatusUnauthorized, "no such user")
+		return
+	}
+
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+		context.JSON(http.StatusUnauthorized, "no such user")
+	}
+
+	context.JSON(http.StatusOK, "Signed in")
+
+}

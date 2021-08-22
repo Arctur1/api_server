@@ -46,3 +46,19 @@ func UpdateCoin(db *gorm.DB, c *models.Coin) error {
 	}
 	return nil
 }
+
+func GetUserByName(username string, db *gorm.DB) (models.User, bool, error) {
+	user := models.User{}
+
+	query := db.Select("user.*")
+	query = query.Group("user.username")
+	err := query.Where("user.username = ?", username).First(&user).Error
+	if err != nil && !gorm.IsRecordNotFoundError(err) {
+		return user, false, err
+	}
+
+	if gorm.IsRecordNotFoundError(err) {
+		return user, false, nil
+	}
+	return user, true, nil
+}
