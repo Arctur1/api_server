@@ -25,6 +25,6 @@ func setupServer() *gin.Engine {
 	route.PATCH("/coins/:id", api.UpdateCoin)
 	route.DELETE("/coins/:id", api.DeleteCoin)
 	route.POST("/signup", api.Signup)
-	route.POST("/siginin", api.Signin)
+	route.POST("/signin", api.Signin)
 	return route
 }

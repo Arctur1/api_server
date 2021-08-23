@@ -35,9 +35,9 @@ func (a *APIEnv) Signup(c *gin.Context) {
 }
 
 func (a *APIEnv) Signin(context *gin.Context) {
-	password := context.Params.ByName("password")
-	username := context.Params.ByName("username")
-	user, exists, err := GetUserByName(username, a.DB)
+	var creds Credentials
+	context.BindJSON(&creds)
+	user, exists, err := GetUserByName(creds.Username, a.DB)
 	if err != nil {
 		fmt.Println(err)
 		context.JSON(http.StatusInternalServerError, err.Error())
@@ -45,12 +45,13 @@ func (a *APIEnv) Signin(context *gin.Context) {
 	}
 
 	if !exists {
-		context.JSON(http.StatusUnauthorized, "no such user")
+		context.JSON(http.StatusUnauthorized, creds.Username)
 		return
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		context.JSON(http.StatusUnauthorized, "no such user")
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
+		context.JSON(http.StatusUnauthorized, "Wrong password")
+		return
 	}
 
 	context.JSON(http.StatusOK, "Signed in")

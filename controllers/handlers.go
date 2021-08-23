@@ -19,9 +19,9 @@ func GetCoins(db *gorm.DB) ([]models.Coin, error) {
 func GetCoinByID(id string, db *gorm.DB) (models.Coin, bool, error) {
 	coin := models.Coin{}
 
-	query := db.Select("coin.*")
-	query = query.Group("coin.id")
-	err := query.Where("coin.id = ?", id).First(&coin).Error
+	query := db.Select("coins.*")
+	query = query.Group("coins.id")
+	err := query.Where("coins.id = ?", id).First(&coin).Error
 	if err != nil && !gorm.IsRecordNotFoundError(err) {
 		return coin, false, err
 	}
@@ -50,9 +50,10 @@ func UpdateCoin(db *gorm.DB, c *models.Coin) error {
 func GetUserByName(username string, db *gorm.DB) (models.User, bool, error) {
 	user := models.User{}
 
-	query := db.Select("user.*")
-	query = query.Group("user.username")
-	err := query.Where("user.username = ?", username).First(&user).Error
+	query := db.Select("users.username")
+	query = query.Group("users.username")
+	//err := db.Where("username = ?", username).First(&user).Error
+	err := db.Find(&user, "username = ?", username).Error
 	if err != nil && !gorm.IsRecordNotFoundError(err) {
 		return user, false, err
 	}
