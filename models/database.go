@@ -22,11 +22,11 @@ func Init() *gorm.DB {
 		log.Print("sad .env file found")
 	}
 
-	host, port, dbName, user, pass := os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD")
+	host, port, dbName, user, pass, ssl := os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_SSLMODE")
 
-	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		host, port, user, dbName, pass)
+	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+		host, port, user, dbName, pass, ssl)
 
 	db, err := gorm.Open("postgres", DBURL)
 	if err != nil {
