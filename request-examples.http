@@ -1,0 +1,60 @@
+#Get all coins
+GET http://localhost:8080/coins
+Content-Type: application/json
+
+###
+
+#Create coin
+POST http://localhost:8080/coins
+Content-Type: application/json
+
+{
+  "coin": "btc",
+  "balance": 1
+}
+
+###
+
+#Get voin by id
+GET http://localhost:8080/coins/1
+Content-Type: application/json
+
+###
+
+#Update coin
+PATCH http://localhost:8080/coins/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "coin": "btc",
+  "balance": 2
+}
+
+###
+
+#Delete coin
+DELETE http://localhost:8080/coins/1
+Content-Type: application/json
+
+###
+
+#Sign up
+POST http://localhost:8080/signup
+Content-Type: application/json
+
+{
+  "Username": "username",
+  "Password": "password"
+}
+
+###
+
+#Sign in
+POST http://localhost:8080/signin
+Content-Type: application/json
+
+{
+  "Username": "username",
+  "Password": "password"
+}
